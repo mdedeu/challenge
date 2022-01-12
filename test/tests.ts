@@ -14,9 +14,9 @@ describe('ETHPool', () => {
     const counterFactory = (await getContractFactory('ETHPool', signers[0])) as ETHPool__factory
     ETHPool = await counterFactory.deploy()
     await ETHPool.deployed()
-    const initialCount = await ETHPool.getCount()
-    expect(initialCount).to.eq(0)
-    expect(ETHPool.address).to.properAddress
+    const prov = ethers.getDefaultProvider();
+    const balance = await prov.getBalance(ETHPool.address);
+    expect(balance).to.eq(0)
   })
 
   describe('Team ', async () => {
