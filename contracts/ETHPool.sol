@@ -10,12 +10,13 @@ contract ETHPool is Ownable {
 
     address[] stakeHolders;
     mapping(address => uint) balances;
+    uint256 totalBalance; //we need this because we use this.balance in a payable function
 
     function depositRewards() public onlyOwner payable{
       for(uint i= 0; i < stakeHolders.length; i++){
-          uint percentage = balances[stakeHolders[i]] / address(this).balance;
-          balances[stakeHolders[i]] += percentage * msg.value;
+          balances[stakeHolders[i]] += (msg.value * balances[stakeHolders[i]]  / totalBalance); 
       }
+      totalBalance += msg.value;
     }
     function withdraw() public{
         require(balances[msg.sender] > 0 );
@@ -27,5 +28,6 @@ contract ETHPool is Ownable {
     function deposit() public payable {
         stakeHolders.push(msg.sender);
         balances[msg.sender] += msg.value;
+        totalBalance+= msg.value;
     }
 }

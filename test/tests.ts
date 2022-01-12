@@ -65,13 +65,14 @@ describe('ETHPool', () => {
 
     await expect(await ETHPool.connect(signers[1]).functions.deposit(options)).to.changeEtherBalance(signers[1], ethers.utils.parseEther("-10.0") );
 
-    await ETHPool.functions.depositRewards(options);
+    await ETHPool.functions.depositRewards({value: ethers.utils.parseEther("1.0")});
 
     await expect(await ETHPool.connect(signers[2]).functions.deposit(options)).to.changeEtherBalance(signers[2], ethers.utils.parseEther("-10.0") );
 
-    await expect(await ETHPool.connect(signers[1]).functions.withdraw()).to.changeEtherBalance(signers[1], ethers.utils.parseEther("20.0") );
+    
+    await expect(await ETHPool.connect(signers[1]).functions.withdraw()).to.changeEtherBalance(signers[1], ethers.utils.parseEther("11.0") );
 
-    await expect(await ETHPool.connect(signers[2]).functions.withdraw()).to.changeEtherBalance(signers[1], ethers.utils.parseEther("10.0") );
+    await expect(await ETHPool.connect(signers[2]).functions.withdraw()).to.changeEtherBalance(signers[2], ethers.utils.parseEther("10.0") );
 
   })
 
