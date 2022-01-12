@@ -3,15 +3,18 @@ import { ethers } from 'hardhat'
 import '@nomiclabs/hardhat-ethers'
 
 import { ETHPool__factory, ETHPool } from '../build/types'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 const { getContractFactory, getSigners } = ethers
 //to-do code optimization. This ugly as shit but, first day of Typescript uh.
 
-describe('ETHPool', () => {
+describe('ETHPool', async () => {
   let ETHPool: ETHPool
+  let signers: SignerWithAddress[];
+
 
   beforeEach(async () => {
-    const signers = await getSigners();
+    signers = await getSigners();
     const ethpoolFactory = (await getContractFactory('ETHPool', signers[0])) as ETHPool__factory;
     ETHPool = await ethpoolFactory.deploy();
     await ETHPool.deployed();
@@ -28,7 +31,6 @@ describe('ETHPool', () => {
     }),
     it('should reject not-owner rewards', async () => {
       const options = {value: ethers.utils.parseEther("10.0")}
-      const signers = await getSigners();
   
       await expect( ETHPool.connect(signers[1]).functions.depositRewards(options)).to.be.reverted;
     })
@@ -37,7 +39,6 @@ describe('ETHPool', () => {
 
   it('should accept deposits from users', async () => {
     const options = {value: ethers.utils.parseEther("10.0")}
-    const signers = await getSigners();
 
     await ETHPool.connect(signers[1]).functions.deposit(options);
 
@@ -46,7 +47,6 @@ describe('ETHPool', () => {
 
   it('should accept withdrawals from users', async () => {
     const options = {value: ethers.utils.parseEther("10.0")}
-    const signers = await getSigners();
 
     await ETHPool.connect(signers[1]).functions.deposit(options);
 
@@ -59,14 +59,12 @@ describe('ETHPool', () => {
 
   it('should reject withdrawls without deposit', async () => {
     const options = {value: ethers.utils.parseEther("10.0")}
-    const signers = await getSigners();
 
     await expect( ETHPool.connect(signers[1]).functions.withdraw()).to.be.reverted;
   }),
   it('should give rewards to signer 1', async () => {
 
     const options = {value: ethers.utils.parseEther("10.0")}
-    const signers = await getSigners();
 
     await expect(await ETHPool.connect(signers[1]).functions.deposit(options)).to.changeEtherBalance(signers[1], ethers.utils.parseEther("-10.0") );
 
@@ -82,7 +80,6 @@ describe('ETHPool', () => {
   }),
   it('should split rewards 25% signer1 and 75% signer2 ', async () => {
 
-    const signers = await getSigners();
 
     await expect(await ETHPool.connect(signers[1]).functions.deposit({value: ethers.utils.parseEther("25.0")})).to.changeEtherBalance(signers[1], ethers.utils.parseEther("-25.0") );
 
