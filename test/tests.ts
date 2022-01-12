@@ -74,7 +74,25 @@ describe('ETHPool', () => {
 
     await expect(await ETHPool.connect(signers[2]).functions.withdraw()).to.changeEtherBalance(signers[2], ethers.utils.parseEther("10.0") );
 
+  }),
+  it('should split rewards 25% signer1 and 75% signer2 ', async () => {
+
+    const signers = await getSigners();
+
+    await expect(await ETHPool.connect(signers[1]).functions.deposit({value: ethers.utils.parseEther("25.0")})).to.changeEtherBalance(signers[1], ethers.utils.parseEther("-25.0") );
+
+
+    await expect(await ETHPool.connect(signers[2]).functions.deposit({value: ethers.utils.parseEther("75.0")})).to.changeEtherBalance(signers[2], ethers.utils.parseEther("-75.0") );
+
+    
+    await ETHPool.functions.depositRewards({value: ethers.utils.parseEther("100.0")});
+
+    await expect(await ETHPool.connect(signers[1]).functions.withdraw()).to.changeEtherBalance(signers[1], ethers.utils.parseEther("50.0") );
+
+    await expect(await ETHPool.connect(signers[2]).functions.withdraw()).to.changeEtherBalance(signers[2], ethers.utils.parseEther("150.0") );
+
   })
+
 
 
 })
