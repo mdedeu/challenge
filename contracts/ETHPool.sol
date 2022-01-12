@@ -10,7 +10,7 @@ contract ETHPool is Ownable {
 
     address[] stakeHolders;
     mapping(address => uint) balances;
-    uint256 totalBalance; //we need this because we use this.balance in a payable function
+    uint256 totalBalance; 
 
     function depositRewards() public onlyOwner payable{
       for(uint i= 0; i < stakeHolders.length; i++){
