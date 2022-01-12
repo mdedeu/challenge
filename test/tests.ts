@@ -5,6 +5,7 @@ import '@nomiclabs/hardhat-ethers'
 import { ETHPool__factory, ETHPool } from '../build/types'
 
 const { getContractFactory, getSigners } = ethers
+//to-do code optimization. This ugly as shit but, first day of Typescript uh.
 
 describe('ETHPool', () => {
   let ETHPool: ETHPool
