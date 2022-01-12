@@ -20,17 +20,19 @@ describe('ETHPool', async () => {
     await ETHPool.deployed();
   })
   describe('Team', async () => {
+
     it('should accept rewards from team, once somebody deposited', async () => {
-      const options = {value: ethers.utils.parseEther("10.0")}
+      const options = {value: ethers.utils.parseEther("1.0")}
 
       ETHPool.functions.deposit(options);
   
       await ETHPool.functions.depositRewards(options);
   
-      expect(await ethers.provider.getBalance(ETHPool.address)).to.eq(ethers.utils.parseEther("20.0"));
+      expect(await ethers.provider.getBalance(ETHPool.address)).to.eq(ethers.utils.parseEther("2.0"));
     }),
+
     it('should reject not-owner rewards', async () => {
-      const options = {value: ethers.utils.parseEther("10.0")}
+      const options = {value: ethers.utils.parseEther("43.0")}
   
       await expect( ETHPool.connect(signers[1]).functions.depositRewards(options)).to.be.reverted;
     })
@@ -38,15 +40,15 @@ describe('ETHPool', async () => {
   describe('User', async ()=> {
 
   it('should accept deposits from users', async () => {
-    const options = {value: ethers.utils.parseEther("10.0")}
+    const options = {value: ethers.utils.parseEther("90.0")}
 
     await ETHPool.connect(signers[1]).functions.deposit(options);
 
-    expect(await ethers.provider.getBalance(ETHPool.address)).to.eq(ethers.utils.parseEther("10.0"));
+    expect(await ethers.provider.getBalance(ETHPool.address)).to.eq(ethers.utils.parseEther("90.0"));
   }),
 
   it('should accept withdrawals from users', async () => {
-    const options = {value: ethers.utils.parseEther("10.0")}
+    const options = {value: ethers.utils.parseEther("0.9")}
 
     await ETHPool.connect(signers[1]).functions.deposit(options);
 
@@ -58,10 +60,11 @@ describe('ETHPool', async () => {
   
 
   it('should reject withdrawls without deposit', async () => {
-    const options = {value: ethers.utils.parseEther("10.0")}
+    const options = {value: ethers.utils.parseEther("0.5")}
 
     await expect( ETHPool.connect(signers[1]).functions.withdraw()).to.be.reverted;
   }),
+
   it('should give rewards to signer 1', async () => {
 
     const options = {value: ethers.utils.parseEther("10.0")}
