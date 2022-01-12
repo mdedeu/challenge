@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.7;
 
-import "@openzeppelin/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 //TO-DO instead of owner, implement roles
 
@@ -17,15 +17,15 @@ contract ETHPool is Ownable {
           balances[stakeHolders[i]] += percentage * msg.value;
       }
     }
-
     function withdraw() public{
         require(balances[msg.sender] > 0 );
         uint amount = balances[msg.sender];
         balances[msg.sender] = 0;
-        msg.sender.transfer(amount);
+        payable(msg.sender).transfer(amount);
     }
 
     function deposit() public payable {
+        stakeHolders.push(msg.sender);
         balances[msg.sender] += msg.value;
     }
 }
