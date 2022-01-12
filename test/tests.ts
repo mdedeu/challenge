@@ -16,14 +16,24 @@ describe('ETHPool', () => {
     ETHPool = await ethpoolFactory.deploy();
     await ETHPool.deployed();
   })
-    
-  it('should accept rewards from team', async () => {
-    const options = {value: ethers.utils.parseEther("10.0")}
+  describe('Team', async () => {
+    it('should accept rewards from team, once somebody deposited', async () => {
+      const options = {value: ethers.utils.parseEther("10.0")}
 
-    await ETHPool.functions.depositRewards(options);
-
-    expect(await ethers.provider.getBalance(ETHPool.address)).to.eq(ethers.utils.parseEther("10.0"));
-  }),
+      ETHPool.functions.deposit(options);
+  
+      await ETHPool.functions.depositRewards(options);
+  
+      expect(await ethers.provider.getBalance(ETHPool.address)).to.eq(ethers.utils.parseEther("20.0"));
+    }),
+    it('should reject not-owner rewards', async () => {
+      const options = {value: ethers.utils.parseEther("10.0")}
+      const signers = await getSigners();
+  
+      await expect( ETHPool.connect(signers[1]).functions.depositRewards(options)).to.be.reverted;
+    })
+  }),  
+  describe('User', async ()=> {
 
   it('should accept deposits from users', async () => {
     const options = {value: ethers.utils.parseEther("10.0")}
@@ -45,12 +55,7 @@ describe('ETHPool', () => {
     expect(await ethers.provider.getBalance(ETHPool.address)).to.eq(ethers.utils.parseEther("0.0"));
   }), 
 
-  it('should reject not-owner rewards', async () => {
-    const options = {value: ethers.utils.parseEther("10.0")}
-    const signers = await getSigners();
-
-    await expect( ETHPool.connect(signers[1]).functions.depositRewards(options)).to.be.reverted;
-  }),
+  
 
   it('should reject withdrawls without deposit', async () => {
     const options = {value: ethers.utils.parseEther("10.0")}
@@ -59,7 +64,6 @@ describe('ETHPool', () => {
     await expect( ETHPool.connect(signers[1]).functions.withdraw()).to.be.reverted;
   }),
   it('should give rewards to signer 1', async () => {
-    //A should get 20, B should get 10
 
     const options = {value: ethers.utils.parseEther("10.0")}
     const signers = await getSigners();
@@ -93,6 +97,8 @@ describe('ETHPool', () => {
     await expect(await ETHPool.connect(signers[2]).functions.withdraw()).to.changeEtherBalance(signers[2], ethers.utils.parseEther("150.0") );
 
   })
+})
+ 
 
 
 

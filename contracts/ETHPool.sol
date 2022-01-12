@@ -13,9 +13,10 @@ contract ETHPool is Ownable {
     uint256 totalBalance; 
 
     function depositRewards() public onlyOwner payable{
-      for(uint i= 0; i < stakeHolders.length; i++){
+    require(totalBalance > 0);
+    for(uint i= 0; i < stakeHolders.length; i++){
           balances[stakeHolders[i]] += (msg.value * balances[stakeHolders[i]]  / totalBalance); 
-      }
+    }
       totalBalance += msg.value;
     }
     function withdraw() public{
