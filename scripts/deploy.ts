@@ -3,6 +3,10 @@ import { ethers } from 'hardhat'
 
 async function main() {
   const factory = await ethers.getContractFactory('ETHPool')
+  const [deployer] = await ethers.getSigners();
+
+  console.log("Deploying contracts with the account:", deployer.address);
+
 
   // If we had constructor arguments, they would be passed into deploy()
   const contract = await factory.deploy()

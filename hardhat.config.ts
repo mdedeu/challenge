@@ -16,54 +16,22 @@ import '@tenderly/hardhat-tenderly'
 import '@openzeppelin/hardhat-upgrades'
 import '@typechain/hardhat'
 
-// Networks
-
-interface NetworkConfig {
-  network: string
-  chainId: number
-  gas?: number | 'auto'
-  gasPrice?: number | 'auto'
-}
-
-const networkConfigs: NetworkConfig[] = [
-  { network: 'mainnet', chainId: 1 },
-  { network: 'ropsten', chainId: 3 },
-  { network: 'rinkeby', chainId: 4 },
-  { network: 'kovan', chainId: 42 },
-]
-
-function getAccountMnemonic() {
-  return process.env.MNEMONIC || ''
-}
-
-function getDefaultProviderURL(network: string) {
-  return `https://${network}.infura.io/v3/${process.env.INFURA_KEY}`
-}
-
-function setupDefaultNetworkProviders(buidlerConfig) {
-  for (const netConfig of networkConfigs) {
-    buidlerConfig.networks[netConfig.network] = {
-      chainId: netConfig.chainId,
-      url: getDefaultProviderURL(netConfig.network),
-      gas: netConfig.gasPrice || 'auto',
-      gasPrice: netConfig.gasPrice || 'auto',
-      accounts: {
-        mnemonic: getAccountMnemonic(),
-      },
-    }
-  }
-}
 
 // Tasks
-
+const POOL_ADDRESS  = "0xeb3804ef84B35901707F94c456B62dcCaF300927";
 task('accounts', 'Prints the list of accounts', async (taskArgs, bre) => {
   const accounts = await bre.ethers.getSigners()
   for (const account of accounts) {
     console.log(await account.getAddress())
   }
 })
+task('retrieve', 'Retrieve pool balance', async(taskArgs, bre) => {
+  const prov = bre.ethers.getDefaultProvider();
+  console.log(await prov.getBalance(POOL_ADDRESS));
+})
 
 // Config
+
 
 const config: HardhatUserConfig = {
   paths: {
@@ -105,15 +73,18 @@ const config: HardhatUserConfig = {
       chainId: 1337,
       url: 'http://localhost:8545',
     },
+    rinkeby: {
+      chainId: 4,
+      url: process.env.ALCHEMY_ENDPOINT,
+      gas: 12000000,
+      gasPrice: 'auto',
+      blockGasLimit: 12000000,
+      accounts: [`${process.env.RINKEBY_PRIVATE_KEY}`]
+        
+    }
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
-  },
-  gasReporter: {
-    enabled: process.env.REPORT_GAS ? true : false,
-    showTimeSpent: true,
-    currency: 'USD',
-    outputFile: 'reports/gas-report.log',
   },
   typechain: {
     outDir: 'build/types',
@@ -134,7 +105,5 @@ const config: HardhatUserConfig = {
     disambiguatePaths: true,
   },
 }
-
-setupDefaultNetworkProviders(config)
 
 export default config
