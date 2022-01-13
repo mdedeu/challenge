@@ -2,17 +2,23 @@
 
 pragma solidity ^0.8.7;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-//TO-DO instead of owner, implement roles
 
-contract ETHPool is Ownable {
+contract ETHPool is AccessControl {
+
+    bytes32 public constant TEAM_MEMBER = keccak256("TEAM_MEMBER");
+
+    constructor() {
+        _grantRole(TEAM_MEMBER, msg.sender);
+    }
 
     address[] stakeHolders;
+    mapping(address => bool) exists;
     mapping(address => uint) balances;
     uint256 totalBalance; 
 
-    function depositRewards() public onlyOwner payable{
+    function depositRewards() public  onlyRole(TEAM_MEMBER) payable{
     require(totalBalance > 0);
     for(uint i= 0; i < stakeHolders.length; i++){
           balances[stakeHolders[i]] += (msg.value * balances[stakeHolders[i]]  / totalBalance); 
@@ -27,7 +33,10 @@ contract ETHPool is Ownable {
     }
 
     function deposit() public payable {
-        stakeHolders.push(msg.sender);
+        if(!exists[msg.sender]){
+            stakeHolders.push(msg.sender);
+            exists[msg.sender] = true;
+        }
         balances[msg.sender] += msg.value;
         totalBalance+= msg.value;
     }

@@ -96,6 +96,20 @@ describe('ETHPool', async () => {
 
     await expect(await ETHPool.connect(signers[2]).functions.withdraw()).to.changeEtherBalance(signers[2], ethers.utils.parseEther("150.0") );
 
+  }),
+  it('should not give double rewards', async () => {
+
+
+    await expect(await ETHPool.connect(signers[1]).functions.deposit({value: ethers.utils.parseEther("2.0")})).to.changeEtherBalance(signers[1], ethers.utils.parseEther("-2.0") );
+
+
+    await expect(await ETHPool.connect(signers[1]).functions.deposit({value: ethers.utils.parseEther("2.0")})).to.changeEtherBalance(signers[1], ethers.utils.parseEther("-2.0") );
+
+    
+    await ETHPool.functions.depositRewards({value: ethers.utils.parseEther("100.0")});
+
+    await expect(await ETHPool.connect(signers[1]).functions.withdraw()).to.changeEtherBalance(signers[1], ethers.utils.parseEther("104.0") );
+
   })
 })
  
