@@ -26,7 +26,7 @@ task('accounts', 'Prints the list of accounts', async (taskArgs, bre) => {
   }
 })
 task('retrieve', 'Retrieve pool balance', async(taskArgs, bre) => {
-  const prov = bre.ethers.getDefaultProvider();
+  const prov = bre.ethers.getDefaultProvider('rinkeby');
   console.log(await prov.getBalance(POOL_ADDRESS));
 })
 
