@@ -18,7 +18,7 @@ import '@typechain/hardhat'
 
 
 // Tasks
-const POOL_ADDRESS  = "0xeb3804ef84B35901707F94c456B62dcCaF300927";
+const POOL_ADDRESS  = "0x89f69f1A1DE98Dbf9cC3dca38ed4956a70D740ac";
 task('accounts', 'Prints the list of accounts', async (taskArgs, bre) => {
   const accounts = await bre.ethers.getSigners()
   for (const account of accounts) {
