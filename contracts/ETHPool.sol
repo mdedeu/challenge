@@ -17,23 +17,23 @@ contract ETHPool is AccessControl {
     uint256 total_balance;
 
     function depositRewards() public payable onlyRole(TEAM_MEMBER) {
-        require(totalBalance > 0  && msg.value >= totalBalance);
-        total_rewards += (msg.value / total_balance);
+        require(total_balance > 0);
+        total_rewards += ((msg.value* 1 ether) / total_balance);
         total_balance += msg.value;
     }
 
     function withdraw() public {
         require(balances[msg.sender] > 0);
-        uint256 amount = balances[msg.sender] + balances[msg.sender] * (total_rewards - rewards_when_deposited[msg.sender]);
+        total_balance-= balances[msg.sender];
+        uint256 amount = balances[msg.sender];
         balances[msg.sender] = 0;
-        totalBalance-= amount;
-        payable(msg.sender).transfer(amount);
+        payable(msg.sender).transfer(amount + amount * (total_rewards - rewards_when_deposited[msg.sender]) / 1 ether);
         
     } 
 
     function deposit() public payable {
         rewards_when_deposited[msg.sender] = total_rewards;
         balances[msg.sender] += msg.value;
-        totalBalance += msg.value;
+        total_balance += msg.value;
     }
 }
