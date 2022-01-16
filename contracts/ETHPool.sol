@@ -27,7 +27,9 @@ contract ETHPool is AccessControl {
         total_balance-= balances[msg.sender];
         uint256 amount = balances[msg.sender];
         balances[msg.sender] = 0;
-        payable(msg.sender).transfer(amount + amount * (total_rewards - rewards_when_deposited[msg.sender]) / 1 ether);
+        
+        (bool success, ) = msg.sender.call{value: amount + amount * (total_rewards - rewards_when_deposited[msg.sender]) / 1 ether}("");
+        require(success, "Transfer failed.");
         
     } 
 
