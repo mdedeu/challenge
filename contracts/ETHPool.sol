@@ -11,32 +11,32 @@ contract ETHPool is AccessControl {
         _grantRole(TEAM_MEMBER, msg.sender);
     }
 
-    address[] stakeHolders;
-    mapping(address => bool) exists;
+    mapping(address => uint256) rewards_when_deposited;
+    uint256 total_rewards;
     mapping(address => uint256) balances;
-    uint256 totalBalance;
+    uint256 total_balance;
 
     function depositRewards() public payable onlyRole(TEAM_MEMBER) {
-        require(totalBalance > 0);
-        for (uint256 i = 0; i < stakeHolders.length; i++) {
-            balances[stakeHolders[i]] += ((msg.value * balances[stakeHolders[i]]) / totalBalance);
-        }
-        totalBalance += msg.value;
+        require(total_balance > 0);
+        total_rewards += ((msg.value * 1 ether) / total_balance);
+        total_balance += msg.value;
     }
 
     function withdraw() public {
         require(balances[msg.sender] > 0);
+        total_balance -= balances[msg.sender];
         uint256 amount = balances[msg.sender];
         balances[msg.sender] = 0;
-        payable(msg.sender).transfer(amount);
+
+        (bool success, ) = msg.sender.call{
+            value: amount + (amount * (total_rewards - rewards_when_deposited[msg.sender])) / 1 ether
+        }("");
+        require(success, "Transfer failed.");
     }
 
     function deposit() public payable {
-        if (!exists[msg.sender]) {
-            stakeHolders.push(msg.sender);
-            exists[msg.sender] = true;
-        }
+        rewards_when_deposited[msg.sender] = total_rewards;
         balances[msg.sender] += msg.value;
-        totalBalance += msg.value;
+        total_balance += msg.value;
     }
 }
